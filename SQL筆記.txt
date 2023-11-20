@@ -1,0 +1,73 @@
+Python
+1.連接資料庫
+	conn = psycopg2.connect(database = 'postgres' ,user = 'postgres',password='123456',port='5432')
+	curs=conn.cursor()
+	以上皆為預設
+2.執行SQL指令
+	將指令丟入sql
+	ex : sql = 'select * from weather'   #select(讀取) *(所有) from(在) weather(檔案名稱)
+	curs.execute(sql)
+
+3.關閉
+	curs.close()
+	conn.close()
+4.讀取資料
+	data=curs.fetchall()
+	用於以執行(項目2)後調出資料
+
+5.展示創建資料庫再刪除
+	#展示現有資料庫
+	sql="SELECT tablename FROM PG_TABLES WHERE SCHEMANAME = 'public';"
+	curs.execute(sql)
+	print("現有結果{}".format( curs.fetchall()))
+	#創建Person 資料庫
+	sql="""CREATE TABLE "Person"("ID" SERIAL PRIMARY KEY NOT NULL, "Name" TEXT, "Age" INT)"""
+	curs.execute(sql)
+	#展示創建後之資料庫
+	sql="SELECT tablename FROM PG_TABLES WHERE SCHEMANAME = 'public';"
+	curs.execute(sql)
+	print("創建後{}".format( curs.fetchall()))
+	#刪除新創之資料庫
+	sql="""DROP TABLE "Person";"""
+	curs.execute(sql)
+	#展示刪除後資料庫
+	sql="SELECT tablename FROM PG_TABLES WHERE SCHEMANAME = 'public';"
+	curs.execute(sql)
+	print("創建後{}".format( curs.fetchall()))
+
+
+
+
+
+PostgreSQL
+
+1.顯示現有的資料檔案名稱
+	SELECT tablename FROM PG_TABLES WHERE SCHEMANAME = 'public';
+2.讀取檔案
+	SELECT * FROM weather
+	SELECT(選取) *(所有) FROM(在) weather(檔案名稱)
+3.建立資料庫名稱weather 包含 city temp_lo temp_hi prcp date 
+	CREATE TABLE weather (
+	    city            varchar(80),
+	    temp_lo         int,           -- low temperature
+	    temp_hi         int,           -- high temperature
+	    prcp            real,          -- precipitation
+	    date            date
+	);
+	verchar(80)-->80字元內的文字
+	int-->int
+	real-->單精度浮點數
+	date-->日期表示
+	(--)-->註解
+4.寫入資料
+	照順序輸入
+	INSERT INTO weather VALUES ('San Francisco', 46, 50, 0.25, '1994-11-27');
+	限制順序輸入
+	INSERT INTO weather (city, temp_lo, temp_hi, prcp, date) VALUES ('San Francisco', 43, 57, 0.0, '1994-11-29');
+	
+5. 批量寫入 讀取檔案
+	COPY weather FROM '/home/user/weather.txt';
+	後面加入以下則以逗號為分割
+	(DELIMITER(','))
+	ex: if data 15,15,15,15
+		COPY weather FROM '/home/user/weather.txt (DELIMITER(','))'
