@@ -37,6 +37,7 @@ n=0
 # # 將txt檔案轉成資料庫
 # sql="""COPY iris FROM 'D:\python/fastAPI/iris.txt' (DELIMITER(','));"""
 # curs.execute(sql)
+# conn.commit()    #確認以上建立與處存之資料進入postgerSQL資料庫
 sql = 'select * from iris;'
 curs.execute(sql) 
 data=curs.fetchall() 
