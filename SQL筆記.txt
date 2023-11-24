@@ -34,7 +34,12 @@ Python
 	sql="SELECT tablename FROM PG_TABLES WHERE SCHEMANAME = 'public';"
 	curs.execute(sql)
 	print("創建後{}".format( curs.fetchall()))
-
+6.可加入判讀是否存在檔案
+	#創建Person 資料庫如果不存在
+	sql="""CREATE TABLE if not exists "Person"("ID" SERIAL PRIMARY KEY NOT NULL, "Name" TEXT, "Age" INT)"""
+	curs.execute(sql)
+7.更新完成需上傳存入postgreSQL
+	conn.commit()
 
 
 

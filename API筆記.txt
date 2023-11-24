@@ -1,3 +1,60 @@
 1.執行
 	uvicorn main:app --reload
              (檔案名稱)
+2.測試程式postman 
+	1.記得更改成json輸入 因其預設就是json而不是txt
+	2.http://127.0.0.1:8000/ 代表get 內所回傳之東西
+	3.http://127.0.0.1:8000/predict 則代表post實際程式回傳之東西
+	4.如需輸入且回傳用body內的raw 且改第一點
+3.EX:
+	from fastapi import FastAPI
+	import tensorflow.compat.v1 as tf
+	from pydantic import BaseModel
+	import numpy as np
+
+
+	MODEL = tf.keras.models.load_model('model.h5') 
+
+	app = FastAPI()                     #必要設定
+
+	class UserInput(BaseModel):         #運用BaseModel輸入東西 UserInput只是class 名稱
+    		Speal_Leng : float          #設定名稱與輸入之型態(float int str)
+    		Speal_Width : float
+    		Petal_Leng : float
+    		Petal_Width : float
+
+	@app.get('/')                       #當網頁路徑出現(EX:http://127.0.0.1:8000 其直接顯示此get內的回傳值)
+	async def index():
+    		return {"Message": "鳶尾花分類器"}   #(EX:http://127.0.0.1:8000 其直接顯示 鳶尾花分類器)
+	
+	@app.post('/predict')
+	async def predict(Data: UserInput):  #當網頁路徑出現(EX:http://127.0.0.1:8000/predict 其直接顯示此post內的回傳值)
+			      		     #此內為主要網頁之回傳資料
+    		data=Data.dict()
+    		Speal_Leng=data['Speal_Leng']
+    		Speal_Width=data['Speal_Width']
+    		Petal_Leng=data['Petal_Leng']
+   		Petal_Width=data['Petal_Width']
+
+    		prediction = MODEL.predict([[Speal_Leng,Speal_Width,Petal_Leng,Petal_Width]])
+    		prediction1=np.argmax(prediction,axis=-1)
+    		# print(prediction1)
+    		if prediction1[0]==0:
+    	    		return {"prediction": "Iris-setosa"}
+    		elif prediction1[0]==1:
+        		return {"prediction": "Iris-versicolor"}
+    		elif prediction1[0]==2:
+        		return {"prediction": "Iris-virginica"}
+4.可用多次get直接讀取資料於網址輸入時
+	@app.get("/")                              #當網頁路徑出現(EX:http://127.0.0.1:8000 其直接顯示此get內的回傳值)
+	def read_root():
+    		return{"Hello": "World"}            #直接顯示
+
+	@app.get("/user/{user_id}")                               #當網頁路徑出現(EX:http://127.0.0.1:8000/user/02 其直接顯示此get內的回傳值)
+	def user_item(user_id: int, q: Optional[str] = None):     #設定輸入型態與回傳內容EX:上面輸入02且為int則user_id=2 而q沒東西輸出NULL
+    		return {"user_id": user_id, "q": q}
+5.錯誤
+	ImportError: cannot import name 'ParamSpec'
+	重新安裝fastapi
+	pip uninstall fastapi
+	pip install fastapi
